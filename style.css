@@ -47,3 +47,11 @@ body {
   padding: 2px;
   cursor: pointer;
 }
+
+
+p {
+  font-size: 15px;
+  font-weight: bolder;
+  margin: 2px;
+  padding: 0;
+}
