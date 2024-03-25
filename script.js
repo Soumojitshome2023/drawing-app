@@ -39,6 +39,7 @@ document.addEventListener('mouseup', () => {
 canvas.addEventListener('mousemove', (e) => {
     e.preventDefault();
     if (isPressed) {
+        document.getElementById('status').innerText = "...Processing";
         const pos = getPosition(e);
         const x2 = pos.x - canvas.offsetLeft;
         const y2 = pos.y - canvas.offsetTop;
@@ -67,6 +68,7 @@ canvas.addEventListener('touchend', () => {
 canvas.addEventListener('touchmove', (e) => {
     e.preventDefault();
     if (isPressed) {
+        document.getElementById('status').innerText = "...Processing";
         const pos = getPosition(e);
         const x2 = pos.x - canvas.offsetLeft;
         const y2 = pos.y - canvas.offsetTop;
@@ -117,9 +119,10 @@ decreaseBtn.addEventListener('click', () => {
 
 colorEl.addEventListener('change', (e) => (color = e.target.value));
 
-clearEl.addEventListener('click', () =>
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-);
+clearEl.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    saveCanvasToLocalStorage();
+});
 
 function downloadCanvas() {
     const tempCanvas = document.createElement('canvas');
@@ -155,13 +158,45 @@ function downloadCanvas() {
 downloadBtn.addEventListener('click', downloadCanvas);
 
 
-window.onbeforeunload = function (e) {
-    // Define the confirmation message
-    var confirmationMessage = "Changes you made may not be saved.";
+// window.onbeforeunload = function (e) {
+//     // Define the confirmation message
+//     var confirmationMessage = "Changes you made may not be saved.";
 
-    // Display the confirmation message
-    (e || window.event).returnValue = confirmationMessage; // For IE and Firefox
-    return confirmationMessage; // For other browsers
-};
+//     // Display the confirmation message
+//     (e || window.event).returnValue = confirmationMessage; // For IE and Firefox
+//     return confirmationMessage; // For other browsers
+// };
 
 
+// const saveBtn = document.getElementById('saveBtn');
+
+// Function to save the canvas image to localStorage
+function saveCanvasToLocalStorage() {
+    const dataUrl = canvas.toDataURL('image/png');
+    localStorage.setItem('savedCanvas', dataUrl);
+    // alert('Canvas saved successfully!');
+    document.getElementById('status').innerText = "Saved";
+}
+
+// Attach event listener to the save button
+// saveBtn.addEventListener('click', saveCanvasToLocalStorage);
+
+setInterval(() => {
+    saveCanvasToLocalStorage();
+}, 3000);
+
+
+// Function to retrieve saved canvas data from localStorage
+function loadCanvasFromLocalStorage() {
+    const savedDataUrl = localStorage.getItem('savedCanvas');
+    if (savedDataUrl) {
+        const img = new Image();
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+        };
+        img.src = savedDataUrl;
+    }
+}
+
+// Call the function when the page loads
+window.addEventListener('load', loadCanvasFromLocalStorage);
