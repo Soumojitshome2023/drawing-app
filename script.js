@@ -37,6 +37,7 @@ document.addEventListener('mouseup', () => {
 });
 
 canvas.addEventListener('mousemove', (e) => {
+    e.preventDefault();
     if (isPressed) {
         const pos = getPosition(e);
         const x2 = pos.x - canvas.offsetLeft;
@@ -64,6 +65,7 @@ canvas.addEventListener('touchend', () => {
 });
 
 canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
     if (isPressed) {
         const pos = getPosition(e);
         const x2 = pos.x - canvas.offsetLeft;
@@ -107,8 +109,8 @@ increaseBtn.addEventListener('click', () => {
 
 decreaseBtn.addEventListener('click', () => {
     size -= 1;
-    if (size < 5) {
-        size = 5;
+    if (size < 3) {
+        size = 3;
     }
     updateSizeOnScreen();
 });
@@ -151,3 +153,15 @@ function downloadCanvas() {
 }
 
 downloadBtn.addEventListener('click', downloadCanvas);
+
+
+window.onbeforeunload = function (e) {
+    // Define the confirmation message
+    var confirmationMessage = "Changes you made may not be saved.";
+
+    // Display the confirmation message
+    (e || window.event).returnValue = confirmationMessage; // For IE and Firefox
+    return confirmationMessage; // For other browsers
+};
+
+
