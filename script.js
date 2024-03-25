@@ -111,8 +111,8 @@ increaseBtn.addEventListener('click', () => {
 
 decreaseBtn.addEventListener('click', () => {
     size -= 1;
-    if (size < 3) {
-        size = 3;
+    if (size < 2) {
+        size = 2;
     }
     updateSizeOnScreen();
 });
@@ -200,3 +200,65 @@ function loadCanvasFromLocalStorage() {
 
 // Call the function when the page loads
 window.addEventListener('load', loadCanvasFromLocalStorage);
+
+
+
+const undoBtn = document.getElementById('undoBtn');
+const redoBtn = document.getElementById('redoBtn');
+let undoStack = [];
+let redoStack = [];
+
+// Function to save the current canvas state
+function saveCanvasState() {
+    undoStack.push(canvas.toDataURL());
+    redoStack = []; // Clear the redo stack when a new action is performed
+    updateUndoRedoButtons();
+}
+
+// Function to update the state of undo and redo buttons
+function updateUndoRedoButtons() {
+    undoBtn.disabled = undoStack.length === 0;
+    redoBtn.disabled = redoStack.length === 0;
+}
+
+// Function to undo the last drawing action
+function undo() {
+    if (undoStack.length > 0) {
+        redoStack.push(canvas.toDataURL()); // Save the current state before undoing
+        const dataUrl = undoStack.pop(); // Retrieve the previous state
+        const img = new Image();
+        img.onload = function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+        };
+        img.src = dataUrl;
+        updateUndoRedoButtons();
+    }
+}
+
+// Function to redo the last undone action
+function redo() {
+    if (redoStack.length > 0) {
+        undoStack.push(canvas.toDataURL()); // Save the current state before redoing
+        const dataUrl = redoStack.pop(); // Retrieve the next state
+        const img = new Image();
+        img.onload = function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+        };
+        img.src = dataUrl;
+        updateUndoRedoButtons();
+    }
+}
+
+// Attach event listeners to the undo and redo buttons
+undoBtn.addEventListener('click', undo);
+redoBtn.addEventListener('click', redo);
+
+// Attach event listener to save canvas state whenever a drawing action is performed
+canvas.addEventListener('mousedown', saveCanvasState);
+canvas.addEventListener('touchstart', saveCanvasState);
+
+// Initialize the state of undo and redo buttons
+updateUndoRedoButtons();
+
