@@ -224,6 +224,7 @@ function updateUndoRedoButtons() {
 // Function to undo the last drawing action
 function undo() {
     if (undoStack.length > 0) {
+        document.getElementById('status').innerText = "...Processing";
         redoStack.push(canvas.toDataURL()); // Save the current state before undoing
         const dataUrl = undoStack.pop(); // Retrieve the previous state
         const img = new Image();
@@ -239,6 +240,7 @@ function undo() {
 // Function to redo the last undone action
 function redo() {
     if (redoStack.length > 0) {
+        document.getElementById('status').innerText = "...Processing";
         undoStack.push(canvas.toDataURL()); // Save the current state before redoing
         const dataUrl = redoStack.pop(); // Retrieve the next state
         const img = new Image();
