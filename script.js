@@ -4,96 +4,120 @@ const decreaseBtn = document.getElementById('decrease');
 const sizeEL = document.getElementById('size');
 const colorEl = document.getElementById('color');
 const clearEl = document.getElementById('clear');
+const downloadBtn = document.getElementById('downloadBtn');
 
 const ctx = canvas.getContext('2d');
-canvas.width = (window.innerWidth) * 0.98;
-canvas.height = (window.innerHeight) * 0.82;
+canvas.width = window.innerWidth * 0.98;
+canvas.height = window.innerHeight * 0.82;
 
-let size = 10
-let isPressed = false
-colorEl.value = 'black'
-let color = colorEl.value
-let x
-let y
+let size = 10;
+let isPressed = false;
+let color = 'black';
+let x, y;
+
+function getPosition(e) {
+    if (e.touches) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    } else {
+        return { x: e.clientX, y: e.clientY };
+    }
+}
 
 canvas.addEventListener('mousedown', (e) => {
-    isPressed = true
+    isPressed = true;
+    const pos = getPosition(e);
+    x = pos.x - canvas.offsetLeft;
+    y = pos.y - canvas.offsetTop;
+});
 
-    x = e.offsetX
-    y = e.offsetY
-})
-
-document.addEventListener('mouseup', (e) => {
-    isPressed = false
-
-    x = undefined
-    y = undefined
-})
+document.addEventListener('mouseup', () => {
+    isPressed = false;
+    x = undefined;
+    y = undefined;
+});
 
 canvas.addEventListener('mousemove', (e) => {
     if (isPressed) {
-        const x2 = e.offsetX
-        const y2 = e.offsetY
+        const pos = getPosition(e);
+        const x2 = pos.x - canvas.offsetLeft;
+        const y2 = pos.y - canvas.offsetTop;
 
-        drawCircle(x2, y2)
-        drawLine(x, y, x2, y2)
+        drawCircle(x2, y2);
+        drawLine(x, y, x2, y2);
 
-        x = x2
-        y = y2
+        x = x2;
+        y = y2;
     }
-})
+});
+
+canvas.addEventListener('touchstart', (e) => {
+    const pos = getPosition(e);
+    x = pos.x - canvas.offsetLeft;
+    y = pos.y - canvas.offsetTop;
+    isPressed = true;
+});
+
+canvas.addEventListener('touchend', () => {
+    isPressed = false;
+    x = undefined;
+    y = undefined;
+});
+
+canvas.addEventListener('touchmove', (e) => {
+    if (isPressed) {
+        const pos = getPosition(e);
+        const x2 = pos.x - canvas.offsetLeft;
+        const y2 = pos.y - canvas.offsetTop;
+
+        drawCircle(x2, y2);
+        drawLine(x, y, x2, y2);
+
+        x = x2;
+        y = y2;
+    }
+});
 
 function drawCircle(x, y) {
     ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2)
-    ctx.fillStyle = color
-    ctx.fill()
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
 }
 
 function drawLine(x1, y1, x2, y2) {
-    ctx.beginPath()
-    ctx.moveTo(x1, y1)
-    ctx.lineTo(x2, y2)
-    ctx.strokeStyle = color
-    ctx.lineWidth = size * 2
-    ctx.stroke()
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = size * 2;
+    ctx.stroke();
 }
 
 function updateSizeOnScreen() {
-    sizeEL.innerText = size
+    sizeEL.innerText = size;
 }
 
 increaseBtn.addEventListener('click', () => {
-    size += 1
-
+    size += 1;
     if (size > 50) {
-        size = 50
+        size = 50;
     }
-
-    updateSizeOnScreen()
-})
+    updateSizeOnScreen();
+});
 
 decreaseBtn.addEventListener('click', () => {
-    size -= 1
-
+    size -= 1;
     if (size < 5) {
-        size = 5
+        size = 5;
     }
+    updateSizeOnScreen();
+});
 
-    updateSizeOnScreen()
-})
+colorEl.addEventListener('change', (e) => (color = e.target.value));
 
-colorEl.addEventListener('change', (e) => color = e.target.value)
-
-clearEl.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height))
-
-
-
-
-
-
-
-const downloadBtn = document.getElementById('downloadBtn');
+clearEl.addEventListener('click', () =>
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+);
 
 function downloadCanvas() {
     const tempCanvas = document.createElement('canvas');
@@ -119,9 +143,7 @@ function downloadCanvas() {
     const dataUrl = tempCanvas.toDataURL('image/png');
 
     const link = document.createElement('a');
-
     link.href = dataUrl;
-
     link.download = 'canvas_image.png';
     document.body.appendChild(link);
     link.click();
